@@ -14,37 +14,48 @@
     <script type="text/babel">
         const { useState } = React
 
-        const Modal = () => {
+        function Modal({
+            title,
+            content,
+            show = false,
+            onClose = () => { },
+            onConfirm = () => { }
+        }) {
+            return show && ReactDOM.createPortal(
+                <div className="modal-container">
+                    <div className="modal">
+                        <h2>{title}</h2>
+                        <p>{content}</p>
+                        <div>
+                            <button onClick={onClose}>Annulla</button>
+                            <button onClick={onConfirm}>Conferma</button>
+                        </div>
+
+                    </div>
+                </div>,
+                document.body
+            )
+        }
+
+        const ListaAnimali = () => {
 
             const [animali, setAnimali] = useState([])
+            const [show, setShow] = useState(false)
+            const [input, setInput] = useState("")
 
             const animalsChoices = ["Cane", "Gatto", "Pappagallo", "Cavallo", "Panda"];
 
-            async function addAnimal() {
-
-                try {
-                    const randomIndex = Math.floor(Math.random() * animalsChoices.length);
-                    const randomAnimal = animalsChoices[randomIndex];
-
-                    console.log(randomAnimal)
-
-                    const newArrayAnimals = [...animali, randomAnimal]
-
-                    console.log(newArrayAnimals)
-
-                    setAnimali(newArrayAnimals)
-
-                } catch (err) {
-                    console.error(err)
-                }
-
-
+            function addAnimal() {
+                if(!input) return;
+               setAnimali(() => [...animali, input] )
+               setInput("")
+               setShow(false)
             }
 
             return (
                 <>
                     <button
-                        onClick={addAnimal}
+                        onClick={() => setShow(true)}
                     >
                         Aggiungi Animale
                     </button>
@@ -64,6 +75,19 @@
                             }
                         </ul>
                     </details>
+                    <Modal
+                        show={show}
+                        onClose={() => setShow(false)}
+                        onConfirm={addAnimal}
+                        title="Aggiungi Animale"
+                        content={
+                            <input 
+                            type="texy"
+                            value={input}
+                            onChange={(e) =>setInput(e.target.value) }/>
+                        }
+
+                    />
                 </>
 
             )
@@ -74,7 +98,7 @@
 
         const elementoSpecifico = document.querySelector(".lista-animali")
         const root = createRoot(elementoSpecifico)
-        root.render(<Modal />)
+        root.render(<ListaAnimali />)
 
     </script>
 </head>
@@ -116,3 +140,18 @@ const animalsChoices = ["Cane", "Gatto", "Pappagallo", "Cavallo", "Panda"];
 L’animale selezionato deve essere aggiunto all’interno della lista <ul> come <li>.
 
 Obiettivo: L’utente può vedere gli animali aggiunti dinamicamente nella lista. -->
+
+
+<!-- 📌 Milestone 3: Usare una Modale per Aggiungere Animali
+Espandilo affinché:
+
+La vecchia prop content può essere usata per passare un componente qualsiasi.
+Un nuovo div in fondo alla modale contiene il bottone Annulla e un nuovo bottone Conferma.
+Una nuova prop onConfirm si aspetta una funzione per gestire l’azione di conferma.
+Sostituisci l’aggiunta casuale dell’animale con una modale interattiva:
+Cliccando il bottone "Aggiungi Animale," si apre una modale.
+La modale include un input di testo (passato al prop content) per inserire il nome di un animale.
+Conferma: Aggiunge l’animale alla lista e chiude la modale.
+Annulla: Chiude la modale senza modificare la lista.
+
+Obiettivo: L’utente può aggiungere animali specifici utilizzando la modale. -->
